@@ -1,49 +1,75 @@
 # frozen_string_literal: true
 
+# This produces this correct output but I don't recommend this implementation.
 class Knight
-  attr_reader :vertices, :position
+  attr_reader :position, :ending
+  attr_accessor :paths, :shortest
 
-  def initialize(position)
+  def initialize(position, ending)
     @position = position
-    @vertices = [position]
+    @paths = []
+    @ending = ending
+    @shortest = nil
   end
 
-  def knight_moves(starting, _ending)
-    tree = [starting]
+  def find_path
+    moves([position])
+    final_output if shortest
+
+    until shortest
+      nested_moves
+      find_ending
+    end
+    final_output
   end
 
-  def moves(arr)
+  def print_moves
+    paths.each { |elt| p elt }
+  end
+
+  private
+
+  # This can be refactored to something tidier
+  # Calculates legal moves
+  def moves(co_ords = position)
     moves = [
-      [arr.first + 2, arr.last + 1],
-      [arr.first + 2, arr.last - 1],
-      [arr.first - 2, arr.last + 1],
-      [arr.first - 2, arr.last - 1],
-      [arr.first + 1, arr.last + 2],
-      [arr.first + 1, arr.last - 2],
-      [arr.first - 1, arr.last + 2],
-      [arr.first - 1, arr.last - 2]
+      [co_ords[-1].first + 2, co_ords[-1].last + 1],
+      [co_ords[-1].first + 2, co_ords[-1].last - 1],
+      [co_ords[-1].first - 2, co_ords[-1].last + 1],
+      [co_ords[-1].first - 2, co_ords[-1].last - 1],
+      [co_ords[-1].first + 1, co_ords[-1].last + 2],
+      [co_ords[-1].first + 1, co_ords[-1].last - 2],
+      [co_ords[-1].first - 1, co_ords[-1].last + 2],
+      [co_ords[-1].first - 1, co_ords[-1].last - 2]
     ]
-    legal_moves = moves.select { |move| in_bounds?(move) && !vertices.include?(move) }
-    legal_moves.each { |move| vertices << move unless vertices.include?(move) }
-    legal_moves
+    legal_moves = moves.select { |move| in_bounds?(move) && !co_ords.include?(move) }
+    test = legal_moves.each.map { |elt| co_ords.dup << elt }
+    self.paths += test
   end
 
-  def in_bounds?(arr)
-    (0..7).include?(arr.first) && (0..7).include?(arr.last)
+  def nested_moves(paths = self.paths)
+    paths.each { |idx| moves(idx) }
   end
 
-  def move_chain(root = position)
-    first = moves(root)
-    second = first.map { |elt| moves(elt) }
-    third = second[0].map { |elt| moves(elt) }
-    third2 = second[1].map { |elt| moves(elt) }
-    third += third2
-    third.flatten(1).uniq
+  def in_bounds?(co_ords)
+    (0..7).include?(co_ords.first) && (0..7).include?(co_ords.last)
+  end
+
+  def find_ending
+    result = nil
+    paths.reverse.each do |elt|
+      result = elt if elt.include?(ending)
+    end
+    self.shortest = result
+  end
+
+  def final_output
+    puts "You made it in #{shortest.length - 1} moves! Here's your path:"
+    shortest.each { |idx| p idx }
   end
 end
 
-knight = Knight.new([0, 0])
-
-knight.move_chain
-
-p knight.vertices.sort
+# knight = Knight.new([0, 0], [3, 3])
+# knight.find_path
+# knight.print_moves
+# p knight.paths.length
