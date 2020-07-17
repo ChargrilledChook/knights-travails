@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Knight
   attr_reader :vertices, :position
 
@@ -6,7 +8,7 @@ class Knight
     @vertices = [position]
   end
 
-  def knight_moves(starting, ending)
+  def knight_moves(starting, _ending)
     tree = [starting]
   end
 
@@ -32,15 +34,15 @@ class Knight
 
   def move_chain(root = position)
     first = moves(root)
-    second = first.map {|elt| moves(elt)}
-    third = second[0].map {|elt| moves(elt)}
-    third2 = second[1].map {|elt| moves(elt)}
+    second = first.map { |elt| moves(elt) }
+    third = second[0].map { |elt| moves(elt) }
+    third2 = second[1].map { |elt| moves(elt) }
     third += third2
     third.flatten(1).uniq
   end
 end
 
-knight =  Knight.new([0, 0])
+knight = Knight.new([0, 0])
 
 knight.move_chain
 
