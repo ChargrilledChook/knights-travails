@@ -64,8 +64,9 @@ class Knight
   end
 end
 
-knight = Knight.new([0, 0], [3, 3])
-knight.find_path
-knight.print_moves
-
-p knight.paths.length
+#
+# knight = Knight.new([0, 0], [3, 3])
+# knight.find_path
+# knight.print_moves
+# p knight.paths.length
+#
